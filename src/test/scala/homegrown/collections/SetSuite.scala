@@ -74,5 +74,56 @@ class TestSuite extends FunSuite with Matchers {
     nonEmptySet.union(emptySet)(element2) shouldBe true
   }
 
+  test("Union on Sets with differnet elements should yield an non empty Set with their elements combined") {
+    val el1 = generateRandomStr
+    val el2 = generateRandomStr
+    val el3 = generateRandomStr
+    val el4 = generateRandomStr
+
+    el1 should not be el3
+    el1 should not be el4
+    el2 should not be el3
+    el2 should not be el4
+    val nonEmptySet1 = Set.empty.add(el1).add(el2)
+    val nonEmptySet2 = Set.empty.add(el3).add(el4)
+
+    nonEmptySet1.union(nonEmptySet2)(el1) shouldBe true
+    nonEmptySet1.union(nonEmptySet2)(el2) shouldBe true
+    nonEmptySet2.union(nonEmptySet1)(el3) shouldBe true
+    nonEmptySet2.union(nonEmptySet1)(el4) shouldBe true
+  }
+
+  test("Intersection on an empty set should yield an empty Set") {
+    val element1 = generateRandomStr
+    val element2 = generateRandomStr
+    element1 should not be element2
+    val emptySet = Set.empty
+    val nonEmptySet = emptySet.add(element1).add(element2)
+    emptySet.intersection(nonEmptySet)(element1) shouldBe false
+    emptySet.intersection(nonEmptySet)(element2) shouldBe false
+
+    nonEmptySet.intersection(emptySet)(element1) shouldBe false
+    nonEmptySet.intersection(emptySet)(element2) shouldBe false
+  }
+
+  test("Intersection on Sets with differnet elements should yield an empty Set ") {
+    val el1 = generateRandomStr
+    val el2 = generateRandomStr
+    val el3 = generateRandomStr
+    val el4 = generateRandomStr
+
+    el1 should not be el3
+    el1 should not be el4
+    el2 should not be el3
+    el2 should not be el4
+    val nonEmptySet1 = Set.empty.add(el1).add(el2)
+    val nonEmptySet2 = Set.empty.add(el3).add(el4)
+
+    nonEmptySet1.intersection(nonEmptySet2)(el1) shouldBe false
+    nonEmptySet1.intersection(nonEmptySet2)(el2) shouldBe false
+    nonEmptySet2.intersection(nonEmptySet1)(el3) shouldBe false
+    nonEmptySet2.intersection(nonEmptySet1)(el4) shouldBe false
+  }
+
   def generateRandomStr: String = scala.util.Random.alphanumeric.take(7).mkString
 }

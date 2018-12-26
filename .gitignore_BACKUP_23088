@@ -1,8 +1,0 @@
-*.class
-*.log
-<<<<<<< HEAD
-target/
-project/target/
-project/project/*
-=======
->>>>>>> 25f3c92078992f94a31135212bea177cb97f46a8
