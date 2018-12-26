@@ -125,5 +125,46 @@ class TestSuite extends FunSuite with Matchers {
     nonEmptySet2.intersection(nonEmptySet1)(el4) shouldBe false
   }
 
+  test("Difference on empty Sets should yield an empty Set") {
+    val element1 = generateRandomStr
+    val element2 = generateRandomStr
+    element1 should not be element2
+    val emptySet = Set.empty
+    val emptySet2 = Set.empty
+    emptySet.diff(emptySet2)(element1) shouldBe false
+  }
+
+  test("Difference on an Non-empty set and empty Set should yield an Non-empty Set") {
+    val element1 = generateRandomStr
+    val element2 = generateRandomStr
+    element1 should not be element2
+    val emptySet = Set.empty
+    val nonEmptySet = emptySet.add(element1).add(element2)
+    nonEmptySet.diff(emptySet)(element1) shouldBe true
+    nonEmptySet.diff(emptySet)(element2) shouldBe true
+
+    emptySet.diff(nonEmptySet)(element1) shouldBe false
+    emptySet.diff(nonEmptySet)(element2) shouldBe false
+  }
+
+  test("Difference between Non-empty Sets with differnet elements should yield an Non-empty Set with the elements of the first Set") {
+    val el1 = generateRandomStr
+    val el2 = generateRandomStr
+    val el3 = generateRandomStr
+    val el4 = generateRandomStr
+
+    el1 should not be el3
+    el1 should not be el4
+    el2 should not be el3
+    el2 should not be el4
+    val nonEmptySet1 = Set.empty.add(el1).add(el2)
+    val nonEmptySet2 = Set.empty.add(el3).add(el4)
+
+    nonEmptySet1.diff(nonEmptySet2)(el1) shouldBe true
+    nonEmptySet1.diff(nonEmptySet2)(el2) shouldBe true
+    nonEmptySet1.diff(nonEmptySet1)(el3) shouldBe false
+    nonEmptySet1.diff(nonEmptySet1)(el4) shouldBe false
+  }
+
   def generateRandomStr: String = scala.util.Random.alphanumeric.take(7).mkString
 }
