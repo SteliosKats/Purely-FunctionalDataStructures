@@ -6,6 +6,7 @@ trait Set extends (String => Boolean) {
   def union(that: Set): Set
   def intersection(that: Set): Set
   def diff(that: Set): Set
+  def isSubsetOf(that: Set): Boolean
   /*
   final def union(that: Set): Set = element => this(element) || that(element)
   final def intersection(that: Set): Set = element => this(element) && that(element)
@@ -20,6 +21,7 @@ object Set {
     final override def union(that: Set): Set = otherElements.union(that.add(element)) //TODO check if otherElements.union(NonEmpty(element, that)) is also true
     final override def intersection(that: Set): Set = if (that(element)) otherElements.intersection(that).add(element) else otherElements.intersection(that)
     final override def diff(that: Set): Set = if (that(element)) otherElements.diff(that) else otherElements.diff(that).add(element)
+    final override def isSubsetOf(that: Set): Boolean = if (that(element)) otherElements.isSubsetOf(that) else false
   }
   private object Empty extends Set {
     def apply(input: String): Boolean = false
@@ -28,6 +30,7 @@ object Set {
     final override def union(that: Set): Set = that
     final override def intersection(that: Set): Set = this //or Empty
     final override def diff(that: Set): Set = this
+    final override def isSubsetOf(that: Set): Boolean = true
   }
 
   def empty: Set = Empty

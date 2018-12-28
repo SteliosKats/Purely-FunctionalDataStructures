@@ -173,5 +173,43 @@ class TestSuite extends FunSuite with Matchers {
     nonEmptySet1.diff(nonEmptySet1)(el4) shouldBe false
   }
 
+  test("isSubsetOf on itself should yield true") {
+    val emptySet = Set.empty
+    emptySet.isSubsetOf(emptySet) shouldBe true
+  }
+
+  test("isSubsetOf of a Set A with elements of a set B but also different ones of a B ( A <> B ) should yield false") {
+    val el1 = generateRandomStr
+    val el2 = generateRandomStr
+    val el3 = generateRandomStr
+    val el4 = generateRandomStr
+
+    val setA = Set.empty.add(el1).add(el2).add(el4)
+    val setB = Set.empty.add(el1).add(el2).add(el3)
+    setA.isSubsetOf(setB) shouldBe false
+  }
+
+  test("isSubsetOf of a Set A with elements of a set B not all elements of B ( A ⊆ B ) should yield true") {
+    val el1 = generateRandomStr
+    val el2 = generateRandomStr
+    val el3 = generateRandomStr
+    val el4 = generateRandomStr
+
+    val setA = Set.empty.add(el1).add(el2)
+    val setB = Set.empty.add(el1).add(el2).add(el3).add(el4)
+    setA.isSubsetOf(setB) shouldBe true
+  }
+
+  test("isSubsetOf of a Set A with same and more elements than a set of B ( A ⊇ B ) should yield false") {
+    val el1 = generateRandomStr
+    val el2 = generateRandomStr
+    val el3 = generateRandomStr
+    val el4 = generateRandomStr
+
+    val setA = Set.empty.add(el1).add(el2).add(el3).add(el4)
+    val setB = Set.empty.add(el1).add(el2)
+    setA.isSubsetOf(setB) shouldBe false
+  }
+
   def generateRandomStr: String = scala.util.Random.alphanumeric.take(7).mkString
 }
