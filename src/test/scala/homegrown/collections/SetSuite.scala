@@ -211,5 +211,92 @@ class TestSuite extends FunSuite with Matchers {
     setA.isSubsetOf(setB) shouldBe false
   }
 
+  test("isSuperSetOf on itself should yield true") {
+    val emptySet = Set.empty
+    emptySet.isSuperSetOf(emptySet) shouldBe true
+  }
+
+  test("isSuperSetOf of a Set A with elements of a set B but also different ones of a B ( A <> B ) should yield false") {
+    val el1 = generateRandomStr
+    val el2 = generateRandomStr
+    val el3 = generateRandomStr
+    val el4 = generateRandomStr
+
+    val setA = Set.empty.add(el1).add(el2).add(el4)
+    val setB = Set.empty.add(el1).add(el2).add(el3)
+    setA.isSuperSetOf(setB) shouldBe false
+  }
+
+  test("isSuperSetOf of a Set A with elements of a set B not all elements of B ( A ⊆ B ) should yield false") {
+    val el1 = generateRandomStr
+    val el2 = generateRandomStr
+    val el3 = generateRandomStr
+    val el4 = generateRandomStr
+
+    val setA = Set.empty.add(el1).add(el2)
+    val setB = Set.empty.add(el1).add(el2).add(el3).add(el4)
+    setA.isSuperSetOf(setB) shouldBe false
+  }
+
+  test("isSuperSetOf of a Set A with same and more elements than a set of B ( A ⊇ B ) should yield true") {
+    val el1 = generateRandomStr
+    val el2 = generateRandomStr
+    val el3 = generateRandomStr
+    val el4 = generateRandomStr
+
+    val setA = Set.empty.add(el1).add(el2).add(el3).add(el4)
+    val setB = Set.empty.add(el1).add(el2).add(el3)
+    setA.isSuperSetOf(setB) shouldBe true
+  }
+
+  test("Equality of a set with itself should yield true") {
+    val emptySet = Set.empty
+    emptySet.equals(emptySet) shouldBe true
+  }
+
+  test("Equality of a Set A with elements of a set B but also different ones of a B ( A <> B ) should yield false") {
+    val el1 = generateRandomStr
+    val el2 = generateRandomStr
+    val el3 = generateRandomStr
+    val el4 = generateRandomStr
+
+    val setA = Set.empty.add(el1).add(el2).add(el4)
+    val setB = Set.empty.add(el1).add(el2).add(el3)
+    setA.equals(setB) shouldBe false
+  }
+
+  test("Equality of a Set A with elements of a set B not all elements of B ( A ⊆ B ) should yield false") {
+    val el1 = generateRandomStr
+    val el2 = generateRandomStr
+    val el3 = generateRandomStr
+    val el4 = generateRandomStr
+
+    val setA = Set.empty.add(el1).add(el2)
+    val setB = Set.empty.add(el1).add(el2).add(el3).add(el4)
+    setA.equals(setB) shouldBe false
+  }
+
+  test("Equality of a Set A with same and more elements than a set of B ( A ⊇ B ) should yield false") {
+    val el1 = generateRandomStr
+    val el2 = generateRandomStr
+    val el3 = generateRandomStr
+    val el4 = generateRandomStr
+
+    val setA = Set.empty.add(el1).add(el2).add(el3).add(el4)
+    val setB = Set.empty.add(el1).add(el2).add(el3)
+    setA.equals(setB) shouldBe false
+  }
+
+  test("Equality of a Set A with same elements with a set B ( A == B ) should yield true") {
+    val el1 = generateRandomStr
+    val el2 = generateRandomStr
+    val el3 = generateRandomStr
+    val el4 = generateRandomStr
+
+    val setA = Set.empty.add(el1).add(el2).add(el3).add(el4)
+    val setB = Set.empty.add(el1).add(el2).add(el3).add(el4)
+    setA.equals(setB) shouldBe true
+  }
+
   def generateRandomStr: String = scala.util.Random.alphanumeric.take(7).mkString
 }
