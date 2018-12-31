@@ -14,7 +14,7 @@ class TestSuite extends FunSuite with Matchers {
     val second: String = generateRandomStr
     first should not be second
 
-    val set = Set.empty.add(first)
+    val set = Set(first)
 
     set(first) shouldBe true
     set(second) shouldBe false
@@ -26,7 +26,7 @@ class TestSuite extends FunSuite with Matchers {
 
     val second: String = generateRandomStr
 
-    val set = Set.empty.add(first).add(second)
+    val set = Set(first, second)
     //val newSet = set.add(second)
 
     val newSet2 = set(first)
@@ -36,13 +36,13 @@ class TestSuite extends FunSuite with Matchers {
 
   test("remove from an Non Empty set should yield an Empty Set") {
     val first: String = generateRandomStr
-    val addFirstNonEmpty = Set.empty.add(first)
+    val addFirstNonEmpty = Set(first)
     addFirstNonEmpty(first) shouldBe true
   }
 
   test("remove on a non empty Set should yield a new Set without the element") {
     val element = generateRandomStr
-    val setWithelement = Set.empty.add(element)
+    val setWithelement = Set(element)
     setWithelement(element) shouldBe true
 
     val setWithoutElement = setWithelement.remove(element)
@@ -53,7 +53,7 @@ class TestSuite extends FunSuite with Matchers {
     val element = generateRandomStr
     val element2 = generateRandomStr
     element should not be element2
-    val setWithelement = Set.empty.add(element)
+    val setWithelement = Set(element)
     val setWithelement2 = setWithelement.add(element2)
     setWithelement2(element) shouldBe true
 
@@ -64,7 +64,7 @@ class TestSuite extends FunSuite with Matchers {
   test("Add/remove combo should ensure that all elements are distinct") {
     val element = generateRandomStr
 
-    val set = Set.empty.add(element).add(element).remove(element)
+    val set = Set(element, element).remove(element)
     set(element) shouldBe false
   }
 
@@ -73,7 +73,7 @@ class TestSuite extends FunSuite with Matchers {
     val element2 = generateRandomStr
     element1 should not be element2
     val emptySet = Set.empty
-    val nonEmptySet = Set.empty.add(element1).add(element2)
+    val nonEmptySet = Set(element1, element2)
     emptySet.union(nonEmptySet)(element1) shouldBe true
     emptySet.union(nonEmptySet)(element2) shouldBe true
 
@@ -91,8 +91,8 @@ class TestSuite extends FunSuite with Matchers {
     el1 should not be el4
     el2 should not be el3
     el2 should not be el4
-    val nonEmptySet1 = Set.empty.add(el1).add(el2)
-    val nonEmptySet2 = Set.empty.add(el3).add(el4)
+    val nonEmptySet1 = Set(el1, el2)
+    val nonEmptySet2 = Set(el3, el4)
 
     nonEmptySet1.union(nonEmptySet2)(el1) shouldBe true
     nonEmptySet1.union(nonEmptySet2)(el2) shouldBe true
@@ -164,8 +164,8 @@ class TestSuite extends FunSuite with Matchers {
     el1 should not be el4
     el2 should not be el3
     el2 should not be el4
-    val nonEmptySet1 = Set.empty.add(el1).add(el2)
-    val nonEmptySet2 = Set.empty.add(el3).add(el4)
+    val nonEmptySet1 = Set(el1, el2)
+    val nonEmptySet2 = Set(el3, el4)
 
     nonEmptySet1.diff(nonEmptySet2)(el1) shouldBe true
     nonEmptySet1.diff(nonEmptySet2)(el2) shouldBe true
@@ -184,8 +184,8 @@ class TestSuite extends FunSuite with Matchers {
     val el3 = generateRandomStr
     val el4 = generateRandomStr
 
-    val setA = Set.empty.add(el1).add(el2).add(el4)
-    val setB = Set.empty.add(el1).add(el2).add(el3)
+    val setA = Set(el1, el2, el4)
+    val setB = Set(el1, el2, el3)
     setA.isSubsetOf(setB) shouldBe false
   }
 
@@ -195,8 +195,8 @@ class TestSuite extends FunSuite with Matchers {
     val el3 = generateRandomStr
     val el4 = generateRandomStr
 
-    val setA = Set.empty.add(el1).add(el2)
-    val setB = Set.empty.add(el1).add(el2).add(el3).add(el4)
+    val setA = Set(el1, el2)
+    val setB = Set(el1, el2, el3, el4)
     setA.isSubsetOf(setB) shouldBe true
   }
 
@@ -222,8 +222,8 @@ class TestSuite extends FunSuite with Matchers {
     val el3 = generateRandomStr
     val el4 = generateRandomStr
 
-    val setA = Set.empty.add(el1).add(el2).add(el4)
-    val setB = Set.empty.add(el1).add(el2).add(el3)
+    val setA = Set(el1, el2, el4)
+    val setB = Set(el1, el2, el3)
     setA.isSuperSetOf(setB) shouldBe false
   }
 
@@ -298,5 +298,57 @@ class TestSuite extends FunSuite with Matchers {
     setA.equals(setB) shouldBe true
   }
 
+  test("foreach on an Empty Set should not apply the function") {
+    noException should be thrownBy Set.empty.foreach(_ => sys.error("This exception should not be thrown"))
+  }
+
+  test("foreach on an non Empty Set should apply the function") {
+    var theFunctionWasApplied: Boolean = false
+    Set.empty.add(generateRandomStr).foreach(_ => theFunctionWasApplied = true)
+    theFunctionWasApplied shouldBe true
+  }
+
+  test("foreach shouldBe able to calcuate the size of the given Set 0") {
+    var size = 0;
+    val set = Set.empty
+    set.foreach(_ => size += 1)
+    size shouldBe 0
+    size shouldBe set.size
+  }
+
+  test("foreach shouldBe able to calcuate the size of the given Set 1") {
+    var size = 0;
+    val set = Set.empty.add(generateRandomStr)
+    set.foreach(_ => size += 1)
+    size shouldBe 1
+    size shouldBe set.size
+  }
+
+  test("foreach shouldBe able to calcuate the size of the given Set 4") {
+    var size = 0;
+    val set = Set.empty.add(generateRandomStr).add(generateRandomStr).add(generateRandomStr).add(generateRandomStr)
+    set.foreach(_ => size += 1)
+    size shouldBe 4
+    size shouldBe set.size
+  }
+
+  test("foreach shouldBe able to calcuate the size of the given Set ") {
+    var size = 0;
+    val randomEl = generateRandomStr
+    val set = Set.empty.add(randomEl).add(randomEl).add(randomEl).add(randomEl)
+    set.foreach(_ => size += 1)
+    size shouldBe 1
+    size shouldBe set.size
+  }
+  test("Set.empty should not compile") {
+    "Set()" shouldNot compile
+  }
+  /*  ignore("calling the varargs aplly method on Set should yield a Set with all the arguments as elements") {
+    val el1 = generateRandomStr
+    val el2 = generateRandomStr
+    val el3 = generateRandomStr
+    val el4 = generateRandomStr
+    Set(el1, el2, el3, el4) shouldBe Set.empty.add(el1).add(el2).add(el3).add(el4)
+  }*/
   def generateRandomStr: String = scala.util.Random.alphanumeric.take(7).mkString
 }

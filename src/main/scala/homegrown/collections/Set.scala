@@ -8,10 +8,23 @@ trait Set extends (String => Boolean) {
   def diff(that: Set): Set
   def isSubsetOf(that: Set): Boolean
   final def isSuperSetOf(that: Set): Boolean = that.isSubsetOf(this)
-  final def equals(that: Set): Boolean = this.isSubsetOf(that) && that.isSubsetOf(this)
+  final override def equals(other: Any): Boolean = other match {
+    case that: Set => this.isSubsetOf(that) && that.isSubsetOf(this)
+    case _         => false
+  }
+  def isEmpty: Boolean
+  def size: Int
+  def isSingleton: Boolean
+  def foreach(function: String => Unit): Unit
+
 }
 
 object Set {
+  def apply(element: String, otherElements: String*): Set = {
+    var result: Set = Set.empty.add(element)
+    otherElements.foreach { currrent => result = result.add(currrent) }
+    result
+  }
   private final case class NonEmpty(element: String, otherElements: Set) extends Set {
     def apply(input: String): Boolean = input == element || otherElements(input)
     final override def add(input: String): Set = if (input == element) this else NonEmpty(input, otherElements.add(element))
@@ -20,6 +33,14 @@ object Set {
     final override def intersection(that: Set): Set = if (that(element)) otherElements.intersection(that).add(element) else otherElements.intersection(that)
     final override def diff(that: Set): Set = if (that(element)) otherElements.diff(that) else otherElements.diff(that).add(element)
     final override def isSubsetOf(that: Set): Boolean = if (that(element)) otherElements.isSubsetOf(that) else false
+    final override def isEmpty: Boolean = true || otherElements.isEmpty
+    final override def size: Int = 1 + otherElements.size
+    final override def isSingleton: Boolean = otherElements.isEmpty
+    final override def foreach(function: String => Unit): Unit = {
+      function(element)
+      otherElements.foreach(function)
+    }
+
   }
   private object Empty extends Set {
     def apply(input: String): Boolean = false
@@ -29,7 +50,10 @@ object Set {
     final override def intersection(that: Set): Set = this //or Empty
     final override def diff(that: Set): Set = this
     final override def isSubsetOf(that: Set): Boolean = true
+    final override def size: Int = 0
+    final override def isSingleton: Boolean = true
+    final override def isEmpty = true
+    def foreach(function: String => Unit): Unit = ()
   }
-
   def empty: Set = Empty
 }
