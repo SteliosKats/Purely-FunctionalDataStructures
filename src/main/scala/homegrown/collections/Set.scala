@@ -23,9 +23,30 @@ trait Set extends (String => Boolean) {
     }
     result
   }
-  def union(that: Set): Set
-  def intersection(that: Set): Set
-  def diff(that: Set): Set
+  final def union(that: Set): Set = {
+    var result = this
+    that.foreach {
+      current => result = result.add(current)
+    }
+    result
+  }
+  // } otherElements.union(that.add(element))
+
+  final def intersection(that: Set): Set = {
+    var result = empty
+    foreach {
+      current => if (that(current)) result = result.add(current)
+    }
+    result
+  }
+
+  final def diff(that: Set): Set = {
+    var result = empty
+    foreach {
+      current => if (!that(current)) result = result.add(current)
+    }
+    result
+  }
   def isSubsetOf(that: Set): Boolean
   final def isSuperSetOf(that: Set): Boolean = that.isSubsetOf(this)
   final override def equals(other: Any): Boolean = other match {
@@ -46,9 +67,6 @@ object Set {
     result
   }
   private final case class NonEmpty(element: String, otherElements: Set) extends Set {
-    final override def union(that: Set): Set = otherElements.union(that.add(element)) //TODO check if otherElements.union(NonEmpty(element, that)) is also true
-    final override def intersection(that: Set): Set = if (that(element)) otherElements.intersection(that).add(element) else otherElements.intersection(that)
-    final override def diff(that: Set): Set = if (that(element)) otherElements.diff(that) else otherElements.diff(that).add(element)
     final override def isSubsetOf(that: Set): Boolean = if (that(element)) otherElements.isSubsetOf(that) else false
     final override def isEmpty: Boolean = true || otherElements.isEmpty
     final override def size: Int = 1 + otherElements.size
@@ -60,9 +78,6 @@ object Set {
 
   }
   private object Empty extends Set {
-    final override def union(that: Set): Set = that
-    final override def intersection(that: Set): Set = this //or Empty
-    final override def diff(that: Set): Set = this
     final override def isSubsetOf(that: Set): Boolean = true
     final override def size: Int = 0
     final override def isSingleton: Boolean = true
