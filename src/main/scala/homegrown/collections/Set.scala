@@ -1,29 +1,29 @@
 package homegrown.collections
 
-trait Set extends (String => Boolean) {
+trait Set[Element] extends (Element => Boolean) {
   import Set._
-  final override def apply(input: String): Boolean = {
+  final override def apply(input: Element): Boolean = {
     var result = false
     foreach {
       current => result = result || current == input
     }
     result
   }
-  final def add(input: String): Set = {
+  final def add(input: Element): Set[Element] = {
     var result = NonEmpty(input, empty)
     foreach {
       current => if (current != input) result = NonEmpty(current, result)
     }
     result
   }
-  final def remove(input: String): Set = {
-    var result = Set.empty
+  final def remove(input: Element): Set[Element] = {
+    var result = Set.empty[Element]
     foreach {
       current => if (input != current) result = NonEmpty(current, result)
     }
     result
   }
-  final def union(that: Set): Set = {
+  final def union(that: Set[Element]): Set[Element] = {
     var result = this
     that.foreach {
       current => result = result.add(current)
@@ -32,57 +32,97 @@ trait Set extends (String => Boolean) {
   }
   // } otherElements.union(that.add(element))
 
-  final def intersection(that: Set): Set = {
-    var result = empty
+  final def intersection(that: Set[Element]): Set[Element] = {
+    var result = empty[Element]
     foreach {
       current => if (that(current)) result = result.add(current)
     }
     result
   }
 
-  final def diff(that: Set): Set = {
-    var result = empty
+  final def diff(that: Set[Element]): Set[Element] = {
+    var result = empty[Element]
     foreach {
       current => if (!that(current)) result = result.add(current)
     }
     result
   }
-  def isSubsetOf(that: Set): Boolean
-  final def isSuperSetOf(that: Set): Boolean = that.isSubsetOf(this)
-  final override def equals(other: Any): Boolean = other match {
-    case that: Set => this.isSubsetOf(that) && that.isSubsetOf(this)
-    case _         => false
+  def isSubsetOf(that: Set[Element]): Boolean = {
+    var result = true
+    foreach {
+      current => if (!that(current)) result = false
+    }
+    result
   }
-  def isEmpty: Boolean
-  def size: Int
-  def isSingleton: Boolean
-  def foreach(function: String => Unit): Unit
+  final def isSuperSetOf(that: Set[Element]): Boolean = that.isSubsetOf(this)
+  final override def equals(other: Any): Boolean = other match {
+    case that: Set[Element] => this.isSubsetOf(that) && that.isSubsetOf(this)
+    case _                  => false
+  }
+
+  final def isEmpty: Boolean = {
+    if (this.size == 0) true else false
+  }
+
+  final def size: Int = {
+    var result = 0
+    foreach {
+      _ => result = result + 1
+    }
+    result
+  }
+  def isSingleton: Boolean = {
+    if (isEmpty)
+      false
+    else {
+      val nonEmptySet = this.asInstanceOf[NonEmpty[Element]]
+      val element = nonEmptySet.element
+      val otherElements = nonEmptySet.otherElements
+      otherElements.isEmpty
+    }
+  }
+  final def foreach[Result](function: Element => Result): Unit = {
+    if (nonEmpty) {
+      val nonEmptySet = this.asInstanceOf[NonEmpty[Element]]
+      val element = nonEmptySet.element
+      val otherElements = nonEmptySet.otherElements
+      function(element)
+      otherElements.foreach(function)
+    }
+  }
+
+  final def map[Result](function: Element => Result): Set[Result] = {
+    var result = empty[Result]
+    foreach {
+      current => result = result.add(function(current))
+    }
+    result
+  }
+
+  final def nonEmpty: Boolean = !isEmpty
 
 }
 
 object Set {
-  def apply(element: String, otherElements: String*): Set = {
-    var result: Set = Set.empty.add(element)
+  def apply[Element](element: Element, otherElements: Element*): Set[Element] = {
+    var result: Set[Element] = empty[Element].add(element)
     otherElements.foreach { currrent => result = result.add(currrent) }
     result
   }
-  private final case class NonEmpty(element: String, otherElements: Set) extends Set {
-    final override def isSubsetOf(that: Set): Boolean = if (that(element)) otherElements.isSubsetOf(that) else false
-    final override def isEmpty: Boolean = true || otherElements.isEmpty
-    final override def size: Int = 1 + otherElements.size
-    final override def isSingleton: Boolean = otherElements.isEmpty
-    final override def foreach(function: String => Unit): Unit = {
-      function(element)
-      otherElements.foreach(function)
-    }
 
+  private final case class NonEmpty[Element](element: Element, otherElements: Set[Element]) extends Set[Element]
+
+  private object NonEmpty {
+    private[this] def unapply(any: Any): Option[(String, Any)] = patternMatchingNotSupported
   }
-  private object Empty extends Set {
-    final override def isSubsetOf(that: Set): Boolean = true
-    final override def size: Int = 0
-    final override def isSingleton: Boolean = true
-    final override def isEmpty = true
-    def foreach(function: String => Unit): Unit = ()
+
+  private class Empty[Element] extends Set[Element] {
+    private[this] def unapply(any: Any): Option[(String, Any)] = patternMatchingNotSupported
   }
-  def empty: Set = Empty
+
+  private[this] def unapply(any: Any): Option[(String, Any)] = patternMatchingNotSupported
+
+  private[this] def patternMatchingNotSupported: Nothing = sys.error("pattern matching on Sets is expensive and therefore not supported")
+
+  def empty[Element]: Set[Element] = new Empty[Element]
 }

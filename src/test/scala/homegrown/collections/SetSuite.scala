@@ -340,8 +340,17 @@ class TestSuite extends FunSuite with Matchers {
     size shouldBe 1
     size shouldBe set.size
   }
+
   test("Set.empty should not compile") {
     "Set()" shouldNot compile
+  }
+
+  test("For each should be parametrized in the result of the argument function so that it does not produce warnings") {
+    Set.empty.foreach(_ => 1)
+  }
+
+  test("Map should produce a Set") {
+    Set("Hello", "World").map(_.reverse) shouldBe Set("dlroW", "olleH")
   }
   /*  ignore("calling the varargs aplly method on Set should yield a Set with all the arguments as elements") {
     val el1 = generateRandomStr
