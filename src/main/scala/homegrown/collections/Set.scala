@@ -61,7 +61,7 @@ trait Set[Element] extends (Element => Boolean) {
   }
 
   final def isEmpty: Boolean = {
-    if (this.size == 0) true else false
+    this.isInstanceOf[Empty[Element]]
   }
 
   final def size: Int = {

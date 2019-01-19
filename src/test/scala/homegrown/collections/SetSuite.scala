@@ -72,8 +72,8 @@ class TestSuite extends FunSuite with Matchers {
     val element1 = generateRandomStr
     val element2 = generateRandomStr
     element1 should not be element2
-    val emptySet = Set.empty
-    val nonEmptySet = Set(element1, element2)
+    val emptySet = Set.empty[String]
+    val nonEmptySet = Set[String](element1, element2)
     emptySet.union(nonEmptySet)(element1) shouldBe true
     emptySet.union(nonEmptySet)(element2) shouldBe true
 
@@ -104,8 +104,8 @@ class TestSuite extends FunSuite with Matchers {
     val element1 = generateRandomStr
     val element2 = generateRandomStr
     element1 should not be element2
-    val emptySet = Set.empty
-    val nonEmptySet = emptySet.add(element1).add(element2)
+    val emptySet = Set.empty[String]
+    val nonEmptySet: Set[String] = emptySet.add(element1).add(element2)
     emptySet.intersection(nonEmptySet)(element1) shouldBe false
     emptySet.intersection(nonEmptySet)(element2) shouldBe false
 
@@ -136,8 +136,8 @@ class TestSuite extends FunSuite with Matchers {
     val element1 = generateRandomStr
     val element2 = generateRandomStr
     element1 should not be element2
-    val emptySet = Set.empty
-    val emptySet2 = Set.empty
+    val emptySet = Set.empty[String]
+    val emptySet2 = Set.empty[String]
     emptySet.diff(emptySet2)(element1) shouldBe false
   }
 
@@ -145,8 +145,8 @@ class TestSuite extends FunSuite with Matchers {
     val element1 = generateRandomStr
     val element2 = generateRandomStr
     element1 should not be element2
-    val emptySet = Set.empty
-    val nonEmptySet = emptySet.add(element1).add(element2)
+    val emptySet = Set.empty[String]
+    val nonEmptySet: Set[String] = emptySet.add(element1).add(element2)
     nonEmptySet.diff(emptySet)(element1) shouldBe true
     nonEmptySet.diff(emptySet)(element2) shouldBe true
 
@@ -299,7 +299,7 @@ class TestSuite extends FunSuite with Matchers {
   }
 
   test("foreach on an Empty Set should not apply the function") {
-    noException should be thrownBy Set.empty.foreach(_ => sys.error("This exception should not be thrown"))
+    noException should be thrownBy Set.empty[String].foreach(_ => sys.error("This exception should not be thrown"))
   }
 
   test("foreach on an non Empty Set should apply the function") {
@@ -346,11 +346,15 @@ class TestSuite extends FunSuite with Matchers {
   }
 
   test("For each should be parametrized in the result of the argument function so that it does not produce warnings") {
-    Set.empty.foreach(_ => 1)
+    Set.empty[String].foreach(_ => 1)
   }
 
   test("Map should produce a Set") {
     Set("Hello", "World").map(_.reverse) shouldBe Set("dlroW", "olleH")
+  }
+
+  test("Map should be able to produce a Set other than a String") {
+    Set("random", "generics", "example").map(_.size) shouldBe Set(6, 8, 7)
   }
   /*  ignore("calling the varargs aplly method on Set should yield a Set with all the arguments as elements") {
     val el1 = generateRandomStr
