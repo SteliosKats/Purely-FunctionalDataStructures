@@ -2,13 +2,26 @@ package homegrown.collections
 
 trait Set[Element] extends (Element => Boolean) {
   import Set._
+
   final override def apply(input: Element): Boolean = {
-    var result = false
-    foreach {
-      current => result = result || current == input
+    fold(false) {
+      (acc, current) => acc || current == input
     }
-    result
   }
+
+  final def fold[Result](init: Result)(function: (Result, Element) => Result): Result = {
+    if (isEmpty)
+      init
+    else {
+      val nonEmptySet = this.asInstanceOf[NonEmpty[Element]]
+      val element = nonEmptySet.element
+      val otherElements = nonEmptySet.otherElements
+      val elementResult: Result = function(init, element)
+      val result: Result = otherElements.fold(elementResult)(function)
+      result
+    }
+  }
+
   final def add(input: Element): Set[Element] = {
     var result = NonEmpty(input, empty)
     foreach {
@@ -16,6 +29,7 @@ trait Set[Element] extends (Element => Boolean) {
     }
     result
   }
+
   final def remove(input: Element): Set[Element] = {
     var result = Set.empty[Element]
     foreach {
@@ -23,6 +37,7 @@ trait Set[Element] extends (Element => Boolean) {
     }
     result
   }
+
   final def union(that: Set[Element]): Set[Element] = {
     var result = this
     that.foreach {
@@ -30,7 +45,6 @@ trait Set[Element] extends (Element => Boolean) {
     }
     result
   }
-  // } otherElements.union(that.add(element))
 
   final def intersection(that: Set[Element]): Set[Element] = {
     var result = empty[Element]
@@ -47,14 +61,17 @@ trait Set[Element] extends (Element => Boolean) {
     }
     result
   }
-  def isSubsetOf(that: Set[Element]): Boolean = {
+
+  final def isSubsetOf(that: Set[Element]): Boolean = {
     var result = true
     foreach {
       current => if (!that(current)) result = false
     }
     result
   }
+
   final def isSuperSetOf(that: Set[Element]): Boolean = that.isSubsetOf(this)
+
   final override def equals(other: Any): Boolean = other match {
     case that: Set[Element] => this.isSubsetOf(that) && that.isSubsetOf(this)
     case _                  => false
@@ -71,7 +88,8 @@ trait Set[Element] extends (Element => Boolean) {
     }
     result
   }
-  def isSingleton: Boolean = {
+
+  final def isSingleton: Boolean = {
     if (isEmpty)
       false
     else {
@@ -81,14 +99,21 @@ trait Set[Element] extends (Element => Boolean) {
       otherElements.isEmpty
     }
   }
+
   final def foreach[Result](function: Element => Result): Unit = {
-    if (nonEmpty) {
-      val nonEmptySet = this.asInstanceOf[NonEmpty[Element]]
-      val element = nonEmptySet.element
-      val otherElements = nonEmptySet.otherElements
-      function(element)
-      otherElements.foreach(function)
+    fold(()) {
+      (acc, current) => function(current)
     }
+  }
+
+  final override def hashCode: Int = {
+    var result = 41
+
+    foreach {
+      current => result = result + current.hashCode
+    }
+
+    result
   }
 
   final def map[Result](function: Element => Result): Set[Result] = {
@@ -104,7 +129,6 @@ trait Set[Element] extends (Element => Boolean) {
     foreach {
       outerCurrent =>
         function(outerCurrent).foreach { innerCurrent => result = result.add(innerCurrent)
-
         }
     }
     result
