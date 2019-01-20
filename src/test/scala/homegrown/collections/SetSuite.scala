@@ -356,6 +356,21 @@ class TestSuite extends FunSuite with Matchers {
   test("Map should be able to produce a Set other than a String") {
     Set("random", "generics", "example").map(_.size) shouldBe Set(6, 8, 7)
   }
+
+  test("FlapMap implementation basic testing") {
+    val characters: Set[Char] = Set('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
+    val numbers: Set[Int] = Set(1, 2, 3, 4, 5, 6, 7, 8)
+
+    val chessboard: Set[(Char, Int)] =
+      characters.flatMap { c =>
+        numbers.map { n =>
+          (c -> n)
+        }
+      }
+
+    chessboard.foreach(println)
+    chessboard.size shouldBe 64
+  }
   /*  ignore("calling the varargs aplly method on Set should yield a Set with all the arguments as elements") {
     val el1 = generateRandomStr
     val el2 = generateRandomStr
