@@ -77,23 +77,15 @@ trait Set[Element] extends (Element => Boolean) {
 
   final override def hashCode: Int = fold(41)(_ + _.hashCode)
 
-  final def map[Result](function: Element => Result): Set[Result] = {
-    var result = empty[Result]
-    foreach {
-      current => result = result.add(function(current))
-    }
-    result
-  }
+  final def map[Result](function: Element => Result): Set[Result] = fold(empty[Result])((acc, element) => acc.add(function(element)))
 
-  final def flatMap[Result](function: Element => Set[Result]): Set[Result] = {
-    var result = empty[Result]
-    foreach {
-      outerCurrent =>
-        function(outerCurrent).foreach { innerCurrent => result = result.add(innerCurrent)
+  final def flatMap[Result](function: Element => Set[Result]): Set[Result] =
+    fold(empty[Result]) {
+      (outerAcc, outerCurr) =>
+        function(outerCurr).fold(outerAcc) {
+          (innerAcc, innerCurr) => innerAcc.add(innerCurr)
         }
     }
-    result
-  }
 
   final def nonEmpty: Boolean = !isEmpty
 
