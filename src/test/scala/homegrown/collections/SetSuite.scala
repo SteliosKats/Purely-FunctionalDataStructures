@@ -111,6 +111,8 @@ class TestSuite extends FunSuite with Matchers {
 
     nonEmptySet.intersection(emptySet)(element1) shouldBe false
     nonEmptySet.intersection(emptySet)(element2) shouldBe false
+
+    Set.empty[Nothing].intersection(_ => false) shouldBe Set.empty
   }
 
   test("Intersection on Sets with differnet elements should yield an empty Set ") {
@@ -370,6 +372,16 @@ class TestSuite extends FunSuite with Matchers {
 
     chessboard.foreach(println)
     chessboard.size shouldBe 64
+  }
+  test("Set should be a function") {
+    val orderedClassmates = Seq("Alice", "Bob", "Frank")
+    def isFriend(potentialFriend: String): Boolean = potentialFriend == "Bob" || potentialFriend == "Frank"
+    orderedClassmates.filter(isFriend) shouldBe Seq("Bob", "Frank")
+
+    val friends = Set("Frank", "Bob")
+    orderedClassmates.filter(friends) shouldBe Seq("Bob", "Frank")
+
+    orderedClassmates.filter(isFriend) shouldBe orderedClassmates.filter(friends)
   }
   /*  ignore("calling the varargs aplly method on Set should yield a Set with all the arguments as elements") {
     val el1 = generateRandomStr

@@ -34,8 +34,11 @@ trait Set[Element] extends (Element => Boolean) {
   final def union(that: Set[Element]): Set[Element] =
     fold(that)(_.add(_))
 
-  final def intersection(that: Set[Element]): Set[Element] =
-    fold(empty[Element]) { (acc, currElement) => if (that(currElement)) acc.add(currElement) else acc }
+  final def filter(predicate: Element => Boolean): Set[Element] = fold(empty[Element]) {
+    (acc, current) => if (predicate(current)) acc.add(current) else acc
+  }
+
+  final def intersection(predicate: Element => Boolean): Set[Element] = filter(predicate)
 
   final def diff(that: Set[Element]): Set[Element] =
     fold(empty[Element]) { (acc, currElement) => if (!that(currElement)) acc.add(currElement) else acc }
@@ -92,11 +95,7 @@ trait Set[Element] extends (Element => Boolean) {
 }
 
 object Set {
-  def apply[Element](element: Element, otherElements: Element*): Set[Element] = {
-    var result: Set[Element] = empty[Element].add(element)
-    otherElements.foreach { currrent => result = result.add(currrent) }
-    result
-  }
+  def apply[Element](element: Element, otherElements: Element*): Set[Element] = otherElements.foldLeft(empty[Element].add(element))((acc, currentEl) => acc.add(currentEl))
 
   private final case class NonEmpty[Element](element: Element, otherElements: Set[Element]) extends Set[Element]
 
