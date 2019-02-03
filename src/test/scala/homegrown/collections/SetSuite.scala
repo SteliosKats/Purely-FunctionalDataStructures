@@ -383,6 +383,10 @@ class TestSuite extends FunSuite with Matchers {
 
     orderedClassmates.filter(isFriend) shouldBe orderedClassmates.filter(friends)
   }
+
+  test("Contains on emptySet should yield false") {
+    Set.empty.contains(generateRandomStr) shouldBe false
+  }
   /*  ignore("calling the varargs aplly method on Set should yield a Set with all the arguments as elements") {
     val el1 = generateRandomStr
     val el2 = generateRandomStr

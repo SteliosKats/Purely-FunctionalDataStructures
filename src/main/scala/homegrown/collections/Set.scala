@@ -4,9 +4,15 @@ trait Set[Element] extends (Element => Boolean) {
   import Set._
 
   final override def apply(input: Element): Boolean =
-    fold(false) {
-      (acc, current) => acc || current == input
-    }
+    contains(input)
+
+  final def contains(input: Element): Boolean =
+    fold(false)((acc, current) => acc || current == input)
+
+  final def doesNotContain(input: Element): Boolean =
+    !contains(input)
+
+  final def exists(predicate: Element => Boolean): Boolean = fold(false)((acc, current) => acc || predicate(current))
 
   @scala.annotation.tailrec
   final def fold[Result](init: Result)(function: (Result, Element) => Result): Result = {
@@ -43,8 +49,8 @@ trait Set[Element] extends (Element => Boolean) {
   final def diff(that: Set[Element]): Set[Element] =
     fold(empty[Element]) { (acc, currElement) => if (!that(currElement)) acc.add(currElement) else acc }
 
-  final def isSubsetOf(that: Set[Element]): Boolean =
-    fold(true) { (acc, currElement) => if (!that(currElement)) false else true }
+  final def isSubsetOf(predicate: Element => Boolean): Boolean =
+    fold(true) { (acc, currElement) => if (!predicate(currElement)) false else true }
 
   final def isSuperSetOf(that: Set[Element]): Boolean = that.isSubsetOf(this)
 
