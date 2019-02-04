@@ -20,18 +20,6 @@ trait Set[Element] extends (Element => Boolean) {
 
   final def notForAll(predicate: Element => Boolean): Boolean = !forAll(predicate)
 
-  @scala.annotation.tailrec
-  final def fold[Result](init: Result)(function: (Result, Element) => Result): Result = {
-    if (isEmpty)
-      init
-    else {
-      val nonEmptySet = this.asInstanceOf[NonEmpty[Element]]
-      val element = nonEmptySet.element
-      val otherElements = nonEmptySet.otherElements
-      otherElements.fold(function(init, element))(function)
-    }
-  }
-
   final def add(input: Element): Set[Element] =
     fold(NonEmpty(input, empty)) {
       (acc, currElement) =>
@@ -60,11 +48,6 @@ trait Set[Element] extends (Element => Boolean) {
 
   final def isSuperSetOf(that: Set[Element]): Boolean = that.isSubsetOf(this)
 
-  final override def equals(other: Any): Boolean = other match {
-    case that: Set[Element] => this.isSubsetOf(that) && that.isSubsetOf(this)
-    case _                  => false
-  }
-
   final def isEmpty: Boolean = {
     this.isInstanceOf[Empty[Element]]
   }
@@ -92,6 +75,13 @@ trait Set[Element] extends (Element => Boolean) {
 
   final override def hashCode: Int = fold(41)(_ + _.hashCode)
 
+  final override def equals(other: Any): Boolean = other match {
+    case that: Set[Element] => this.isSubsetOf(that) && that.isSubsetOf(this)
+    case _                  => false
+  }
+
+  final override def toString: String = if (this.isEmpty == true) "Set()" else ???
+
   final def map[Result](function: Element => Result): Set[Result] = fold(empty[Result])((acc, element) => acc.add(function(element)))
 
   final def flatMap[Result](function: Element => Set[Result]): Set[Result] =
@@ -103,6 +93,25 @@ trait Set[Element] extends (Element => Boolean) {
     }
 
   final def nonEmpty: Boolean = !isEmpty
+
+  @scala.annotation.tailrec
+  final def fold[Result](init: Result)(function: (Result, Element) => Result): Result = {
+    if (isEmpty)
+      init
+    else {
+      val nonEmptySet = this.asInstanceOf[NonEmpty[Element]]
+      val element = nonEmptySet.element
+      val otherElements = nonEmptySet.otherElements
+      otherElements.fold(function(init, element))(function)
+    }
+  }
+
+  private[this] lazy val (elementOrThrowException, otherElementsOrThrowException) = {
+    val nonEmptySet = this.asInstanceOf[NonEmpty[Element]]
+    val element = nonEmptySet.element
+    val otherElements = nonEmptySet.otherElements
+    element -> otherElements
+  }
 
 }
 
