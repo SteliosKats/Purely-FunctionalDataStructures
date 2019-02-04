@@ -386,6 +386,16 @@ class TestSuite extends FunSuite with Matchers {
 
   test("Contains on emptySet should yield false") {
     Set.empty.contains(generateRandomStr) shouldBe false
+    Set.empty.doesNotContain(generateRandomStr) shouldBe true
+  }
+
+  test("Exists on an non empty Set should yield true") {
+    val element: String = generateRandomStr
+    Set(element).exists(_.size == element.size) shouldBe true
+    Set(element).exists(_.size != element.size) shouldBe false
+
+    Set(element).doesNotExist(_.size == element.size) shouldBe false
+    Set(element).doesNotExist(_.size != element.size) shouldBe true
   }
   /*  ignore("calling the varargs aplly method on Set should yield a Set with all the arguments as elements") {
     val el1 = generateRandomStr
