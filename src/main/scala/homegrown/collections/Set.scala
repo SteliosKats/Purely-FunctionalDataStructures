@@ -20,7 +20,7 @@ trait Set[Element] extends (Element => Boolean) {
 
   final def notForAll(predicate: Element => Boolean): Boolean = !forAll(predicate)
 
-  final def add(input: Element): Set[Element] =
+  final def add[SuperElement >: Element](input: SuperElement): Set[SuperElement] =
     fold(NonEmpty(input, empty)) {
       (acc, currElement) =>
         if (currElement == input) acc else NonEmpty(currElement, acc)
@@ -31,7 +31,7 @@ trait Set[Element] extends (Element => Boolean) {
       (acc, currElement) => if (currElement == input) acc else NonEmpty(currElement, acc)
     }
 
-  final def union(that: Set[Element]): Set[Element] =
+  final def union[SuperElement >: Element](that: Set[SuperElement]): Set[SuperElement] =
     fold(that)(_.add(_))
 
   final def filter(predicate: Element => Boolean): Set[Element] = fold(empty[Element]) {
