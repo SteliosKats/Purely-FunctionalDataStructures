@@ -47,7 +47,7 @@ stages:
               publishJUnitResults: true
               testResultsFiles: '**/surefire-reports/TEST-*.xml'
               mavenOpts: '-Xmx1024m'
-              options: '-Dresource=$(resourceToCompile)'
+              # options: '-Dresource=$(resourceToCompile)'
 
           - script: |
               echo "Maven version:"
