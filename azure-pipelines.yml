@@ -1,0 +1,55 @@
+# This pipeline will build and test a Java project using Maven with parameters
+trigger:
+  branches:
+    include:
+      - main
+      - migration_azure_pipelines
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  MAVEN_OPTS: '-Dmaven.repo.local=$(Pipeline.Workspace)/.m2/repository'
+  MAVEN_HOME: '/usr/share/maven'
+  JAVA_HOME: '/usr/lib/jvm/java-11-openjdk-amd64'
+
+parameters:
+  - name: resourceToCompile
+    displayName: 'Resource to Compile'
+    type: string
+    default: 'all'
+    values:
+      - all
+      - resource1
+      - resource2
+
+stages:
+  - stage: Build
+    displayName: 'Build and Test'
+    jobs:
+      - job: CheckoutAndCompile
+        displayName: 'Checkout and Compile'
+        steps:
+          - checkout: self
+            displayName: 'Checkout Code'
+            clean: true
+
+          - task: UseMaven@1
+            inputs:
+              mavenVersionOption: 'Default'
+              mavenSetM2Home: true
+              mavenPOMFile: 'pom.xml'
+              options: '-B'
+              goals: 'clean install'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.11'
+              jdkArchitectureOption: 'x64'
+              publishJUnitResults: true
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              mavenOpts: '-Xmx1024m'
+              options: '-Dresource=$(resourceToCompile)'
+
+          - script: |
+              echo "Maven version:"
+              mvn -version
+            displayName: 'Verify Maven Version'
